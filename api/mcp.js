@@ -303,36 +303,7 @@ module.exports = async (req, res) => {
   const { id, method, params } = rpc;
 
   try {
-    if (method === "debug") {
-      ensureLoaded();
-      let dirListing = [];
-      try {
-        dirListing = fs.readdirSync(DATA_DIR).map((f) => {
-          try {
-            return { file: f, bytes: fs.statSync(path.join(DATA_DIR, f)).size };
-          } catch (e) {
-            return { file: f, error: e.message };
-          }
-        });
-      } catch (e) {
-        dirListing = [{ error: e.message }];
-      }
-      sendSse(res, {
-        jsonrpc: "2.0",
-        id,
-        result: {
-          dataDir: DATA_DIR,
-          dirExists: fs.existsSync(DATA_DIR),
-          dirListing,
-          lengths: {
-            standardsIndex: Array.isArray(STANDARDS_INDEX) ? STANDARDS_INDEX.length : typeof STANDARDS_INDEX,
-            qnaIndex: Array.isArray(QNA_INDEX) ? QNA_INDEX.length : typeof QNA_INDEX,
-            qnaFull: Array.isArray(QNA_FULL) ? QNA_FULL.length : typeof QNA_FULL,
-          },
-          metaLoaded: META,
-        },
-      });
-    } else if (method === "tools/list") {
+    if (method === "tools/list") {
       sendSse(res, { jsonrpc: "2.0", id, result: { tools: TOOLS } });
     } else if (method === "tools/call") {
       const toolName = params && params.name;
